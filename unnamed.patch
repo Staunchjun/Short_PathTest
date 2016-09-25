@@ -1,0 +1,1739 @@
+Index: src/Bus.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Bus.java	(revision )
++++ src/Bus.java	(revision )
+@@ -0,0 +1,12 @@
++/**
++ * Created by ruan on 16-9-14.
++ */
++public class Bus {
++    double G = 0;
++    double U = 0;
++
++    public Bus(double g, double u) {
++        G = g;
++        U = u;
++    }
++}
+Index: src/Node.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Node.java	(revision )
++++ src/Node.java	(revision )
+@@ -0,0 +1,27 @@
++/**
++ * Created by ruan on 9/12/16.
++ */
++public class Node {
++    public double G = 0;//real cost
++    public double H = 0;//"Direction" to end point
++    public double F = 0;//G+H = F
++    public double P = 0;//probbilty
++    public int x; //coordinates x
++    public int y;//coordinates y
++    public Node parent;
++    public int N;//number
++
++    public Node(int x, int y) {
++        this.x = x;
++        this.y = y;
++    }
++
++    public Node() {
++
++    }
++
++    public static double getDis(Node p1, Node p2) {
++        double dis = Math.sqrt(Math.abs(p1.x - p2.x) * Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y) * Math.abs(p1.y - p2.y));
++        return dis;
++    }
++}
+Index: Short_Path.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Short_Path.iml	(revision )
++++ Short_Path.iml	(revision )
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="JAVA_MODULE" version="4">
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+Index: src/Graph.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Graph.java	(revision )
++++ src/Graph.java	(revision )
+@@ -0,0 +1,53 @@
++
++import java.util.HashMap;
++
++/**
++ * Created by ruan on 9/12/16.
++ */
++public class Graph {
++
++    public Bag<Integer>[] adj;
++    private java.util.Map<Integer, Node> nodeMap = null;
++    private int V;
++    private int E;
++
++    public Graph(In in) {
++        V = in.readInt();
++        E = in.readInt();
++        adj = (Bag<Integer>[]) new Bag[V];
++        nodeMap = new HashMap<Integer, Node>();
++        for (int v = 0; v < V; v++) {
++            adj[v] = new Bag<Integer>();
++        }
++        for (int i = 0; i < E; i++) {
++            int s = in.readInt();
++            int d = in.readInt();
++            addEdge(s, d);
++        }
++        for (int i = 0; i < V; i++) {
++            Node node = new Node();
++            node.N = in.readInt();
++            node.x = in.readInt();
++            node.y = in.readInt();
++            node.P = in.readDouble();
++            nodeMap.put(node.N, node);
++        }
++    }
++
++    public java.util.Map<Integer, Node> getNodeMap() {
++        return nodeMap;
++    }
++
++    public int getV() {
++        return V;
++    }
++
++    public Iterable<Integer> return_adj(int v) {
++        return adj[v];
++    }
++
++    private void addEdge(int s, int d) {
++        adj[s].add(d);
++    }
++
++}
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/compiler.xml	(revision )
++++ .idea/compiler.xml	(revision )
+@@ -0,0 +1,22 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="CompilerConfiguration">
++    <resourceExtensions />
++    <wildcardResourcePatterns>
++      <entry name="!?*.java" />
++      <entry name="!?*.form" />
++      <entry name="!?*.class" />
++      <entry name="!?*.groovy" />
++      <entry name="!?*.scala" />
++      <entry name="!?*.flex" />
++      <entry name="!?*.kt" />
++      <entry name="!?*.clj" />
++      <entry name="!?*.aj" />
++    </wildcardResourcePatterns>
++    <annotationProcessing>
++      <profile default="true" name="Default" enabled="false">
++        <processorPath useClasspath="true" />
++      </profile>
++    </annotationProcessing>
++  </component>
++</project>
+\ No newline at end of file
+Index: src/Bag.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Bag.java	(revision )
++++ src/Bag.java	(revision )
+@@ -0,0 +1,159 @@
++/******************************************************************************
++ *  Compilation:  javac Bag.java
++ *  Execution:    java Bag < input.txt
++ *  Dependencies: StdIn.java StdOut.java
++ *
++ *  A generic bag or multiset, implemented using a singly-linked list.
++ *
++ *  % more tobe.txt 
++ *  to be or not to - be - - that - - - is
++ *
++ *  % java Bag < tobe.txt
++ *  size of bag = 14
++ *  is
++ *  -
++ *  -
++ *  -
++ *  that
++ *  -
++ *  -
++ *  be
++ *  -
++ *  to
++ *  not
++ *  or
++ *  be
++ *  to
++ *
++ ******************************************************************************/
++
++import java.util.Iterator;
++import java.util.NoSuchElementException;
++
++/**
++ * The <tt>Bag</tt> class represents a bag (or multiset) of
++ * generic items. It supports insertion and iterating over the
++ * items in arbitrary order.
++ * <p>
++ * This implementation uses a singly-linked list with a static nested class Node.
++ * See {@link LinkedBag} for the version from the
++ * textbook that uses a non-static nested class.
++ * The <em>add</em>, <em>isEmpty</em>, and <em>size</em> operations
++ * take constant time. Iteration takes time proportional to the number of items.
++ * <p>
++ * For additional documentation, see <a href="http://algs4.cs.princeton.edu/13stacks">Section 1.3</a> of
++ * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
++ *
++ * @param <Item> the generic type of an item in this bag
++ * @author Robert Sedgewick
++ * @author Kevin Wayne
++ */
++public class Bag<Item> implements Iterable<Item> {
++    private Node<Item> first;    // beginning of bag
++    private int N;               // number of elements in bag
++
++    /**
++     * Initializes an empty bag.
++     */
++    public Bag() {
++        first = null;
++        N = 0;
++    }
++
++    /**
++     * Returns true if this bag is empty.
++     *
++     * @return <tt>true</tt> if this bag is empty;
++     * <tt>false</tt> otherwise
++     */
++    public boolean isEmpty() {
++        return first == null;
++    }
++
++    /**
++     * Returns the number of items in this bag.
++     *
++     * @return the number of items in this bag
++     */
++    public int size() {
++        return N;
++    }
++
++    /**
++     * Adds the item to this bag.
++     *
++     * @param item the item to add to this bag
++     */
++    public void add(Item item) {
++        Node<Item> oldfirst = first;
++        first = new Node<Item>();
++        first.item = item;
++        first.next = oldfirst;
++        N++;
++    }
++
++    /**
++     * Returns an iterator that iterates over the items in this bag in arbitrary order.
++     *
++     * @return an iterator that iterates over the items in this bag in arbitrary order
++     */
++    public Iterator<Item> iterator() {
++        return new ListIterator<Item>(first);
++    }
++
++    // helper linked list class
++    private static class Node<Item> {
++        private Item item;
++        private Node<Item> next;
++    }
++
++    // an iterator, doesn't implement remove() since it's optional
++    private class ListIterator<Item> implements Iterator<Item> {
++        private Node<Item> current;
++
++        public ListIterator(Node<Item> first) {
++            current = first;
++        }
++
++        public boolean hasNext() {
++            return current != null;
++        }
++
++        public void remove() {
++            throw new UnsupportedOperationException();
++        }
++
++        public Item next() {
++            if (!hasNext()) throw new NoSuchElementException();
++            Item item = current.item;
++            current = current.next;
++            return item;
++        }
++
++
++    }
++}
++
++/******************************************************************************
++ *  Copyright 2002-2015, Robert Sedgewick and Kevin Wayne.
++ *
++ *  This file is part of algs4.jar, which accompanies the textbook
++ *
++ *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,
++ *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.
++ *      http://algs4.cs.princeton.edu
++ *
++ *
++ *  algs4.jar is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  algs4.jar is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.
++ ******************************************************************************/
+Index: .idea/dictionaries/ruan.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/dictionaries/ruan.xml	(revision )
++++ .idea/dictionaries/ruan.xml	(revision )
+@@ -0,0 +1,3 @@
++<component name="ProjectDictionaryState">
++  <dictionary name="ruan" />
++</component>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/modules.xml	(revision )
++++ .idea/modules.xml	(revision )
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/Short_Path.iml" filepath="$PROJECT_DIR$/Short_Path.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/copyright/profiles_settings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/copyright/profiles_settings.xml	(revision )
++++ .idea/copyright/profiles_settings.xml	(revision )
+@@ -0,0 +1,3 @@
++<component name="CopyrightManager">
++  <settings default="" />
++</component>
+\ No newline at end of file
+Index: src/StdOut.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/StdOut.java	(revision )
++++ src/StdOut.java	(revision )
+@@ -0,0 +1,339 @@
++/******************************************************************************
++ *  Compilation:  javac StdOut.java
++ *  Execution:    java StdOut
++ *  Dependencies: none
++ *
++ *  Writes data of various types to standard output.
++ *
++ ******************************************************************************/
++
++import java.io.OutputStreamWriter;
++import java.io.PrintWriter;
++import java.io.UnsupportedEncodingException;
++import java.util.Locale;
++
++/**
++ * This class provides methods for printing strings and numbers to standard output.
++ * <p>
++ * <b>Getting started.</b>
++ * To use this class, you must have <tt>StdOut.class</tt> in your
++ * Java classpath. If you used our autoinstaller, you should be all set.
++ * Otherwise, download
++ * <a href = "http://introcs.cs.princeton.edu/java/stdlib/StdOut.java">StdOut.java</a>
++ * and put a copy in your working directory.
++ * <p>
++ * Here is an example program that uses <code>StdOut</code>:
++ * <pre>
++ *   public class TestStdOut {
++ *       public static void main(String[] args) {
++ *           int a = 17;
++ *           int b = 23;
++ *           int sum = a + b;
++ *           StdOut.println("Hello, World");
++ *           StdOut.printf("%d + %d = %d\n", a, b, sum);
++ *       }
++ *   }
++ *  </pre>
++ * <p>
++ * <b>Differences with System.out.</b>
++ * The behavior of <code>StdOut</code> is similar to that of {@link System#out},
++ * but there are a few subtle differences:
++ * <ul>
++ * <li> <code>StdOut</code> coerces the character-set encoding to UTF-8,
++ * which is a standard character encoding for Unicode.
++ * <li> <code>StdOut</code> coerces the locale to {@link Locale#US},
++ * for consistency with {@link StdIn}, {@link Double#parseDouble(String)},
++ * and floating-point literals.
++ * <li> <code>StdOut</code> <em>flushes</em> standard output after each call to
++ * <code>print()</code> so that text will appear immediately in the terminal.
++ * </ul>
++ * <p>
++ * <b>Reference.</b>
++ * For additional documentation,
++ * see <a href="http://introcs.cs.princeton.edu/15inout">Section 1.5</a> of
++ * <em>Introduction to Programming in Java: An Interdisciplinary Approach</em>
++ * by Robert Sedgewick and Kevin Wayne.
++ *
++ * @author Robert Sedgewick
++ * @author Kevin Wayne
++ */
++public final class StdOut {
++
++    // force Unicode UTF-8 encoding; otherwise it's system dependent
++    private static final String CHARSET_NAME = "UTF-8";
++
++    // assume language = English, country = US for consistency with StdIn
++    private static final Locale LOCALE = Locale.US;
++
++    // send output here
++    private static PrintWriter out;
++
++    // this is called before invoking any methods
++    static {
++        try {
++            out = new PrintWriter(new OutputStreamWriter(System.out, CHARSET_NAME), true);
++        } catch (UnsupportedEncodingException e) {
++            System.out.println(e);
++        }
++    }
++
++    // don't instantiate
++    private StdOut() {
++    }
++
++    /**
++     * Closes standard output.
++     */
++    public static void close() {
++        out.close();
++    }
++
++    /**
++     * Terminates the current line by printing the line-separator string.
++     */
++    public static void println() {
++        out.println();
++    }
++
++    /**
++     * Prints an object to this output stream and then terminates the line.
++     *
++     * @param x the object to print
++     */
++    public static void println(Object x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints a boolean to standard output and then terminates the line.
++     *
++     * @param x the boolean to print
++     */
++    public static void println(boolean x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints a character to standard output and then terminates the line.
++     *
++     * @param x the character to print
++     */
++    public static void println(char x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints a double to standard output and then terminates the line.
++     *
++     * @param x the double to print
++     */
++    public static void println(double x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints an integer to standard output and then terminates the line.
++     *
++     * @param x the integer to print
++     */
++    public static void println(float x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints an integer to standard output and then terminates the line.
++     *
++     * @param x the integer to print
++     */
++    public static void println(int x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints a long to standard output and then terminates the line.
++     *
++     * @param x the long to print
++     */
++    public static void println(long x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints a short integer to standard output and then terminates the line.
++     *
++     * @param x the short to print
++     */
++    public static void println(short x) {
++        out.println(x);
++    }
++
++    /**
++     * Prints a byte to standard output and then terminates the line.
++     * <p>
++     * To write binary data, see {@link BinaryStdOut}.
++     *
++     * @param x the byte to print
++     */
++    public static void println(byte x) {
++        out.println(x);
++    }
++
++    /**
++     * Flushes standard output.
++     */
++    public static void print() {
++        out.flush();
++    }
++
++    /**
++     * Prints an object to standard output and flushes standard output.
++     *
++     * @param x the object to print
++     */
++    public static void print(Object x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a boolean to standard output and flushes standard output.
++     *
++     * @param x the boolean to print
++     */
++    public static void print(boolean x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a character to standard output and flushes standard output.
++     *
++     * @param x the character to print
++     */
++    public static void print(char x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a double to standard output and flushes standard output.
++     *
++     * @param x the double to print
++     */
++    public static void print(double x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a float to standard output and flushes standard output.
++     *
++     * @param x the float to print
++     */
++    public static void print(float x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints an integer to standard output and flushes standard output.
++     *
++     * @param x the integer to print
++     */
++    public static void print(int x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a long integer to standard output and flushes standard output.
++     *
++     * @param x the long integer to print
++     */
++    public static void print(long x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a short integer to standard output and flushes standard output.
++     *
++     * @param x the short integer to print
++     */
++    public static void print(short x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a byte to standard output and flushes standard output.
++     *
++     * @param x the byte to print
++     */
++    public static void print(byte x) {
++        out.print(x);
++        out.flush();
++    }
++
++    /**
++     * Prints a formatted string to standard output, using the specified format
++     * string and arguments, and then flushes standard output.
++     *
++     * @param format the <a href = "http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html#syntax">format string</a>
++     * @param args   the arguments accompanying the format string
++     */
++    public static void printf(String format, Object... args) {
++        out.printf(LOCALE, format, args);
++        out.flush();
++    }
++
++    /**
++     * Prints a formatted string to standard output, using the locale and
++     * the specified format string and arguments; then flushes standard output.
++     *
++     * @param locale the locale
++     * @param format the <a href = "http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html#syntax">format string</a>
++     * @param args   the arguments accompanying the format string
++     */
++    public static void printf(Locale locale, String format, Object... args) {
++        out.printf(locale, format, args);
++        out.flush();
++    }
++
++    /**
++     * Unit tests some of the methods in <tt>StdOut</tt>.
++     */
++    public static void main(String[] args) {
++
++        // write to stdout
++        StdOut.println("Test");
++        StdOut.println(17);
++        StdOut.println(true);
++        StdOut.printf("%.6f\n", 1.0 / 7.0);
++    }
++
++}
++
++/******************************************************************************
++ *  Copyright 2002-2015, Robert Sedgewick and Kevin Wayne.
++ *
++ *  This file is part of algs4.jar, which accompanies the textbook
++ *
++ *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,
++ *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.
++ *      http://algs4.cs.princeton.edu
++ *
++ *
++ *  algs4.jar is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  algs4.jar is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.
++ ******************************************************************************/
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/vcs.xml	(revision )
++++ .idea/vcs.xml	(revision )
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: src/graph
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/graph	(revision )
++++ src/graph	(revision )
+@@ -0,0 +1,20 @@
++7
++11
++0 5
++0 1
++0 2
++5 3
++2 5
++2 3
++1 2
++1 4
++4 6
++3 4
++3 6
++0 0 0 0
++1 -1 1 0.6
++2 1 1 0.5
++3 3 2 0.2
++4 3 0 0.8
++5 1 2 0.7
++6 4 1 1
+Index: src/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/Main.java	(revision )
++++ src/Main.java	(revision )
+@@ -0,0 +1,17 @@
++
++
++/**
++ * Created by ruan on 9/12/16.
++ */
++public class Main {
++    public static void main(String args[]) {
++        In in = new In(args[0]);
++        Graph map = new Graph(in);
++        A_star a_star = new A_star();
++
++        a_star.printPath(map, map.getNodeMap().get(0), map.getNodeMap().get(6));
++
++
++    }
++
++}
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(revision )
++++ .idea/misc.xml	(revision )
+@@ -0,0 +1,26 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="EntryPointsManager">
++    <entry_points version="2.0" />
++  </component>
++  <component name="MavenImportPreferences">
++    <option name="generalSettings">
++      <MavenGeneralSettings>
++        <option name="mavenHome" value="Bundled (Maven 3)" />
++      </MavenGeneralSettings>
++    </option>
++  </component>
++  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
++    <OptionsSetting value="true" id="Add" />
++    <OptionsSetting value="true" id="Remove" />
++    <OptionsSetting value="true" id="Checkout" />
++    <OptionsSetting value="true" id="Update" />
++    <OptionsSetting value="true" id="Status" />
++    <OptionsSetting value="true" id="Edit" />
++    <ConfirmationsSetting value="0" id="Add" />
++    <ConfirmationsSetting value="0" id="Remove" />
++  </component>
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/out" />
++  </component>
++</project>
+\ No newline at end of file
+Index: src/A_star.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/A_star.java	(revision )
++++ src/A_star.java	(revision )
+@@ -0,0 +1,230 @@
++import java.util.*;
++
++/**
++ * Created by ruan on 9/12/16.
++ */
++public class A_star {
++    public void printPath(Graph map, Node s, Node d) {
++        PointComparator pointComparator = new PointComparator();
++        PriorityQueue priorityQueue = new PriorityQueue(map.getV(), pointComparator);
++        Map<Double, ArrayList> all_bus = new HashMap<Double, ArrayList>();
++        s.G = 0;
++        s.H = 0;
++        s.F = s.G + s.H;
++        s.parent = null;
++        priorityQueue.offer(s);
++        while (!priorityQueue.isEmpty()) {
++            Node n = (Node) priorityQueue.poll();
++            for (int i : map.return_adj(n.N)) {
++                Node next_n = map.getNodeMap().get(i);
++
++                double temp_G = n.G + Node.getDis(n, next_n);
++                double temp_H = Node.getDis(next_n, d);
++                double temp_F = temp_G + temp_H;
++
++                if (next_n.N == d.N) {
++                    next_n.G = (temp_G);
++                    next_n.H = (temp_H);
++                    next_n.F = (temp_F);
++                    d.parent = n;
++                    Node node = d;
++                    ArrayList<Node> arrayList = new ArrayList();
++                    while (node != null) {
++                        arrayList.add(node);
++                        node = node.parent;
++                    }
++                    all_bus.put(map.getNodeMap().get(6).G, arrayList);
++
++                    break;
++                }
++
++                //这里有问题不知道为什么当arrayList.add(node);添加完结后，继续第二轮数据会出现变动？？
++                if (priorityQueue.contains(next_n)) {
++                    Iterator iterator = priorityQueue.iterator();
++                    Node point = null;
++                    while (iterator.hasNext()) {
++                        point = (Node) iterator.next();
++                        if (point.N == next_n.N) {
++                            break;
++                        }
++                    }
++                    if (temp_F < point.F) {
++                        priorityQueue.remove(point);
++                        next_n.G = temp_G;
++                        next_n.H = temp_H;
++                        next_n.F = temp_F;
++                        priorityQueue.offer(next_n);
++                        next_n.parent = n;
++                    }
++                } else {
++
++                    next_n.G = temp_G;
++                    next_n.H = temp_H;
++                    next_n.F = temp_F;
++                    priorityQueue.offer(next_n);
++                    next_n.parent = n;
++                }
++            }
++
++        }
++
++        ChooseBestPath2(all_bus);
++
++    }
++
++    private void ChooseBestPath2(Map<Double, ArrayList> all_bus) {
++        GComparator gcomp = new GComparator();
++        UComparator ucomp = new UComparator();
++
++        PriorityQueue g_pq = new PriorityQueue(all_bus.size(), gcomp);
++        PriorityQueue u_pq = new PriorityQueue(all_bus.size(), ucomp);
++        for (Map.Entry<Double, ArrayList> stack : all_bus.entrySet()) {
++            double u = 0;
++            Iterator iterator = stack.getValue().iterator();
++            while (iterator.hasNext()) {
++                Node temp = (Node) iterator.next();
++                u = u + temp.P;
++            }
++            Bus bus = new Bus(stack.getKey(), u);
++            g_pq.offer(bus);
++        }
++
++        Bus min_bus = (Bus) g_pq.poll();
++        double L = min_bus.G * 0.25;
++
++        while (!g_pq.isEmpty()) {
++            Bus temp_bus = (Bus) g_pq.poll();
++            if (min_bus.G + L > temp_bus.G) {
++
++                u_pq.add(temp_bus);
++            }
++        }
++
++        Bus max_u_bus = (Bus) u_pq.poll();
++
++        System.out.println("the sum of u is :" + max_u_bus.U);
++        System.out.println("the sum of dis is :" + max_u_bus.G);
++        ArrayList stack = all_bus.get(max_u_bus.G);
++        if (stack == null) {
++            System.out.print("impossible to reach");
++        } else {
++            Iterator iterator = stack.iterator();
++            while (iterator.hasNext()) {
++                Node temp = (Node) iterator.next();
++                System.out.print(temp.N + " <-");
++
++            }
++            System.out.println();
++
++        }
++    }
++
++    //Try to  get the upper left corner ,create a division ,take apart ,just get the point at left region ,and on the left region,we get the max u
++    private void ChooseBestPath(Map<Double, ArrayList> all_bus) {
++        double Cut_off = 0;
++        UComparator ucomp = new UComparator();
++        PriorityQueue u_pq = new PriorityQueue(all_bus.size(), ucomp);
++        for (Map.Entry<Double, ArrayList> stack : all_bus.entrySet()) {
++
++
++            Cut_off = Cut_off + stack.getKey();
++
++        }
++        Cut_off = Cut_off / all_bus.size();
++        for (Map.Entry<Double, ArrayList> stack : all_bus.entrySet()) {
++            double u = 0;
++            if (stack.getKey() <= Cut_off) {
++                Iterator iterator = stack.getValue().iterator();
++                while (iterator.hasNext()) {
++                    Node temp = (Node) iterator.next();
++                    u = u + temp.P;
++
++                }
++                Bus bus = new Bus(stack.getKey(), u);
++                u_pq.offer(bus);
++            }
++        }
++        //get the left uperr point
++        double L = 0.25;
++        ArrayList<Bus> standby_bus = new ArrayList();
++        while (!u_pq.isEmpty()) {
++            Bus min_bus = (Bus) u_pq.poll();
++            Iterator iterator = u_pq.iterator();
++            if (!iterator.hasNext()) {
++                standby_bus.add(min_bus);
++            }
++            while (iterator.hasNext()) {
++                Bus temp_bus = (Bus) iterator.next();
++                if (min_bus.G + L > temp_bus.G && temp_bus.G > min_bus.G - L) {
++                    if (min_bus.U < temp_bus.U) {
++                        standby_bus.add(temp_bus);
++                    } else {
++                        standby_bus.add(min_bus);
++                    }
++                } else {
++                    standby_bus.add(min_bus);
++                }
++            }
++        }
++//        Bus s_bus = (Bus) u_pq.poll();
++        for (Bus s_bus : standby_bus) {
++
++            System.out.println("the sum of u is :" + s_bus.U);
++            System.out.println("the sum of dis is :" + s_bus.G);
++            ArrayList stack = all_bus.get(s_bus.G);
++            if (stack == null) {
++                System.out.print("impossible to reach");
++            } else {
++                Iterator iterator = stack.iterator();
++                while (iterator.hasNext()) {
++                    Node temp = (Node) iterator.next();
++                    System.out.print(temp.N + " <-");
++
++                }
++                System.out.println();
++
++            }
++        }
++
++    }
++
++
++    class UComparator implements Comparator<Bus> {
++        @Override
++        public int compare(Bus o1, Bus o2) {
++            if (o1.U > o2.U) {
++                return -1;
++            } else if (o1 == o2) {
++                return 0;
++            } else {
++                return 1;
++            }
++        }
++    }
++
++    class GComparator implements Comparator<Bus> {
++        @Override
++        public int compare(Bus o1, Bus o2) {
++            if (o1.G < o2.G) {
++                return -1;
++            } else if (o1 == o2) {
++                return 0;
++            } else {
++                return 1;
++            }
++        }
++    }
++
++    class PointComparator implements Comparator<Node> {
++        @Override
++        public int compare(Node o1, Node o2) {
++            if (o1.F < o2.F) {
++                return -1;
++            } else if (o1.F == o2.F) {
++                return 0;
++            } else {
++                return 1;
++            }
++        }
++    }
++}
+Index: src/In.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/In.java	(revision )
++++ src/In.java	(revision )
+@@ -0,0 +1,668 @@
++/******************************************************************************
++ *  Compilation:  javac In.java
++ *  Execution:    java In   (basic test --- see source for required files)
++ *  Dependencies: none
++ *
++ *  Reads in data of various types from standard input, files, and URLs.
++ *
++ ******************************************************************************/
++
++import java.io.*;
++import java.net.Socket;
++import java.net.URL;
++import java.net.URLConnection;
++import java.util.*;
++import java.util.regex.Pattern;
++
++// import java.net.HttpURLConnection;
++
++/**
++ * <i>Input</i>. This class provides methods for reading strings
++ * and numbers from standard input, file input, URLs, and sockets.
++ * <p>
++ * The Locale used is: language = English, country = US. This is consistent
++ * with the formatting conventions with Java floating-point literals,
++ * command-line arguments (via {@link Double#parseDouble(String)})
++ * and standard output.
++ * <p>
++ * For additional documentation, see
++ * <a href="http://introcs.cs.princeton.edu/31datatype">Section 3.1</a> of
++ * <i>Introduction to Programming in Java: An Interdisciplinary Approach</i>
++ * by Robert Sedgewick and Kevin Wayne.
++ * <p>
++ * Like {@link Scanner}, reading a token also consumes preceding Java
++ * whitespace, reading a full line consumes
++ * the following end-of-line delimeter, while reading a character consumes
++ * nothing extra.
++ * <p>
++ * Whitespace is defined in {@link Character#isWhitespace(char)}. Newlines
++ * consist of \n, \r, \r\n, and Unicode hex code points 0x2028, 0x2029, 0x0085;
++ * see <tt><a href="http://www.docjar.com/html/api/java/util/Scanner.java.html">
++ * Scanner.java</a></tt> (NB: Java 6u23 and earlier uses only \r, \r, \r\n).
++ *
++ * @author David Pritchard
++ * @author Robert Sedgewick
++ * @author Kevin Wayne
++ */
++public final class In {
++
++    ///// begin: section (1 of 2) of code duplicated from In to StdIn.
++
++    // assume Unicode UTF-8 encoding
++    private static final String CHARSET_NAME = "UTF-8";
++
++    // assume language = English, country = US for consistency with System.out.
++    private static final Locale LOCALE = Locale.US;
++
++    // the default token separator; we maintain the invariant that this value 
++    // is held by the scanner's delimiter between calls
++    private static final Pattern WHITESPACE_PATTERN
++            = Pattern.compile("\\p{javaWhitespace}+");
++
++    // makes whitespace characters significant 
++    private static final Pattern EMPTY_PATTERN
++            = Pattern.compile("");
++
++    // used to read the entire input. source:
++    // http://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html
++    private static final Pattern EVERYTHING_PATTERN
++            = Pattern.compile("\\A");
++
++    //// end: section (1 of 2) of code duplicated from In to StdIn.
++
++    private Scanner scanner;
++
++    /**
++     * Initializes an input stream from standard input.
++     */
++    public In() {
++        scanner = new Scanner(new BufferedInputStream(System.in), CHARSET_NAME);
++        scanner.useLocale(LOCALE);
++    }
++
++    /**
++     * Initializes an input stream from a socket.
++     *
++     * @param socket the socket
++     * @throws IllegalArgumentException if cannot open {@code socket}
++     * @throws NullPointerException     if {@code socket} is {@code null}
++     */
++    public In(Socket socket) {
++        if (socket == null) throw new NullPointerException("argument is null");
++        try {
++            InputStream is = socket.getInputStream();
++            scanner = new Scanner(new BufferedInputStream(is), CHARSET_NAME);
++            scanner.useLocale(LOCALE);
++        } catch (IOException ioe) {
++            throw new IllegalArgumentException("Could not open " + socket);
++        }
++    }
++
++    /**
++     * Initializes an input stream from a URL.
++     *
++     * @param url the URL
++     * @throws IllegalArgumentException if cannot open {@code url}
++     * @throws NullPointerException     if {@code url} is {@code null}
++     */
++    public In(URL url) {
++        if (url == null) throw new NullPointerException("argument is null");
++        try {
++            URLConnection site = url.openConnection();
++            InputStream is = site.getInputStream();
++            scanner = new Scanner(new BufferedInputStream(is), CHARSET_NAME);
++            scanner.useLocale(LOCALE);
++        } catch (IOException ioe) {
++            throw new IllegalArgumentException("Could not open " + url);
++        }
++    }
++
++    /**
++     * Initializes an input stream from a file.
++     *
++     * @param file the file
++     * @throws IllegalArgumentException if cannot open {@code file}
++     * @throws NullPointerException     if {@code file} is {@code null}
++     */
++    public In(File file) {
++        if (file == null) throw new NullPointerException("argument is null");
++        try {
++            // for consistency with StdIn, wrap with BufferedInputStream instead of use
++            // file as argument to Scanner
++            FileInputStream fis = new FileInputStream(file);
++            scanner = new Scanner(new BufferedInputStream(fis), CHARSET_NAME);
++            scanner.useLocale(LOCALE);
++        } catch (IOException ioe) {
++            throw new IllegalArgumentException("Could not open " + file);
++        }
++    }
++
++
++    /**
++     * Initializes an input stream from a filename or web page name.
++     *
++     * @param name the filename or web page name
++     * @throws IllegalArgumentException if cannot open {@code name} as
++     *                                  a file or URL
++     * @throws NullPointerException     if {@code name} is {@code null}
++     */
++    public In(String name) {
++        if (name == null) throw new NullPointerException("argument is null");
++        try {
++            // first try to read file from local file system
++            File file = new File(name);
++            if (file.exists()) {
++                // for consistency with StdIn, wrap with BufferedInputStream instead of use
++                // file as argument to Scanner
++                FileInputStream fis = new FileInputStream(file);
++                scanner = new Scanner(new BufferedInputStream(fis), CHARSET_NAME);
++                scanner.useLocale(LOCALE);
++                return;
++            }
++
++            // next try for files included in jar
++            URL url = getClass().getResource(name);
++
++            // or URL from web
++            if (url == null) {
++                url = new URL(name);
++            }
++
++            URLConnection site = url.openConnection();
++
++            // in order to set User-Agent, replace above line with these two
++            // HttpURLConnection site = (HttpURLConnection) url.openConnection();
++            // site.addRequestProperty("User-Agent", "Mozilla/4.76");
++
++            InputStream is = site.getInputStream();
++            scanner = new Scanner(new BufferedInputStream(is), CHARSET_NAME);
++            scanner.useLocale(LOCALE);
++        } catch (IOException ioe) {
++            throw new IllegalArgumentException("Could not open " + name);
++        }
++    }
++
++    /**
++     * Initializes an input stream from a given {@link Scanner} source; use with
++     * <tt>new Scanner(String)</tt> to read from a string.
++     * <p>
++     * Note that this does not create a defensive copy, so the
++     * scanner will be mutated as you read on.
++     *
++     * @param scanner the scanner
++     * @throws NullPointerException if {@code scanner} is {@code null}
++     */
++    public In(Scanner scanner) {
++        if (scanner == null) throw new NullPointerException("argument is null");
++        this.scanner = scanner;
++    }
++
++    /**
++     * Reads all integers from a file and returns them as
++     * an array of integers.
++     *
++     * @param filename the name of the file
++     * @return the integers in the file
++     * @deprecated Replaced by <tt>new In(filename)</tt>.{@link #readAllInts()}.
++     */
++    public static int[] readInts(String filename) {
++        return new In(filename).readAllInts();
++    }
++
++    ////  begin: section (2 of 2) of code duplicated from In to StdIn,
++    ////  with all methods changed from "public" to "public static".
++
++    /**
++     * Reads all doubles from a file and returns them as
++     * an array of doubles.
++     *
++     * @param filename the name of the file
++     * @return the doubles in the file
++     * @deprecated Replaced by <tt>new In(filename)</tt>.{@link #readAllDoubles()}.
++     */
++    public static double[] readDoubles(String filename) {
++        return new In(filename).readAllDoubles();
++    }
++
++    /**
++     * Reads all strings from a file and returns them as
++     * an array of strings.
++     *
++     * @param filename the name of the file
++     * @return the strings in the file
++     * @deprecated Replaced by <tt>new In(filename)</tt>.{@link #readAllStrings()}.
++     */
++    public static String[] readStrings(String filename) {
++        return new In(filename).readAllStrings();
++    }
++
++    /**
++     * Reads all integers from standard input and returns them
++     * an array of integers.
++     *
++     * @return the integers on standard input
++     * @deprecated Replaced by {@link StdIn#readAllInts()}.
++     */
++    public static int[] readInts() {
++        return new In().readAllInts();
++    }
++
++    /**
++     * Reads all doubles from standard input and returns them as
++     * an array of doubles.
++     *
++     * @return the doubles on standard input
++     * @deprecated Replaced by {@link StdIn#readAllDoubles()}.
++     */
++    public static double[] readDoubles() {
++        return new In().readAllDoubles();
++    }
++
++    /**
++     * Reads all strings from standard input and returns them as
++     * an array of strings.
++     *
++     * @return the strings on standard input
++     * @deprecated Replaced by {@link StdIn#readAllStrings()}.
++     */
++    public static String[] readStrings() {
++        return new In().readAllStrings();
++    }
++
++    /**
++     * Unit tests the <tt>In</tt> data type.
++     */
++    public static void main(String[] args) {
++        In in;
++        String urlName = "http://introcs.cs.princeton.edu/stdlib/InTest.txt";
++
++        // read from a URL
++        System.out.println("readAll() from URL " + urlName);
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In(urlName);
++            System.out.println(in.readAll());
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++        // read one line at a time from URL
++        System.out.println("readLine() from URL " + urlName);
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In(urlName);
++            while (!in.isEmpty()) {
++                String s = in.readLine();
++                System.out.println(s);
++            }
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++        // read one string at a time from URL
++        System.out.println("readString() from URL " + urlName);
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In(urlName);
++            while (!in.isEmpty()) {
++                String s = in.readString();
++                System.out.println(s);
++            }
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++
++        // read one line at a time from file in current directory
++        System.out.println("readLine() from current directory");
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In("./InTest.txt");
++            while (!in.isEmpty()) {
++                String s = in.readLine();
++                System.out.println(s);
++            }
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++
++        // read one line at a time from file using relative path
++        System.out.println("readLine() from relative path");
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In("../stdlib/InTest.txt");
++            while (!in.isEmpty()) {
++                String s = in.readLine();
++                System.out.println(s);
++            }
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++        // read one char at a time
++        System.out.println("readChar() from file");
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In("InTest.txt");
++            while (!in.isEmpty()) {
++                char c = in.readChar();
++                System.out.print(c);
++            }
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++        System.out.println();
++
++        // read one line at a time from absolute OS X / Linux path
++        System.out.println("readLine() from absolute OS X / Linux path");
++        System.out.println("---------------------------------------------------------------------------");
++        in = new In("/n/fs/introcs/www/java/stdlib/InTest.txt");
++        try {
++            while (!in.isEmpty()) {
++                String s = in.readLine();
++                System.out.println(s);
++            }
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++
++        // read one line at a time from absolute Windows path
++        System.out.println("readLine() from absolute Windows path");
++        System.out.println("---------------------------------------------------------------------------");
++        try {
++            in = new In("G:\\www\\introcs\\stdlib\\InTest.txt");
++            while (!in.isEmpty()) {
++                String s = in.readLine();
++                System.out.println(s);
++            }
++            System.out.println();
++        } catch (Exception e) {
++            System.out.println(e);
++        }
++        System.out.println();
++
++    }
++
++    /**
++     * Returns true if this input stream exists.
++     *
++     * @return <tt>true</tt> if this input stream exists; <tt>false</tt> otherwise
++     */
++    public boolean exists() {
++        return scanner != null;
++    }
++
++    /**
++     * Returns true if input stream is empty (except possibly whitespace).
++     * Use this to know whether the next call to {@link #readString()},
++     * {@link #readDouble()}, etc will succeed.
++     *
++     * @return <tt>true</tt> if this input stream is empty (except possibly whitespace);
++     * <tt>false</tt> otherwise
++     */
++    public boolean isEmpty() {
++        return !scanner.hasNext();
++    }
++
++    /**
++     * Returns true if this input stream has a next line.
++     * Use this method to know whether the
++     * next call to {@link #readLine()} will succeed.
++     * This method is functionally equivalent to {@link #hasNextChar()}.
++     *
++     * @return <tt>true</tt> if this input stream is empty;
++     * <tt>false</tt> otherwise
++     */
++    public boolean hasNextLine() {
++        return scanner.hasNextLine();
++    }
++
++    /**
++     * Returns true if this input stream has more inputy (including whitespace).
++     * Use this method to know whether the next call to {@link #readChar()} will succeed.
++     * This method is functionally equivalent to {@link #hasNextLine()}.
++     *
++     * @return <tt>true</tt> if this input stream has more input (including whitespace);
++     * <tt>false</tt> otherwise
++     */
++    public boolean hasNextChar() {
++        scanner.useDelimiter(EMPTY_PATTERN);
++        boolean result = scanner.hasNext();
++        scanner.useDelimiter(WHITESPACE_PATTERN);
++        return result;
++    }
++
++    /**
++     * Reads and returns the next line in this input stream.
++     *
++     * @return the next line in this input stream; <tt>null</tt> if no such line
++     */
++    public String readLine() {
++        String line;
++        try {
++            line = scanner.nextLine();
++        } catch (NoSuchElementException e) {
++            line = null;
++        }
++        return line;
++    }
++
++    /**
++     * Reads and returns the next character in this input stream.
++     *
++     * @return the next character in this input stream
++     */
++    public char readChar() {
++        scanner.useDelimiter(EMPTY_PATTERN);
++        String ch = scanner.next();
++        assert ch.length() == 1 : "Internal (Std)In.readChar() error!"
++                + " Please contact the authors.";
++        scanner.useDelimiter(WHITESPACE_PATTERN);
++        return ch.charAt(0);
++    }
++
++    /**
++     * Reads and returns the remainder of this input stream, as a string.
++     *
++     * @return the remainder of this input stream, as a string
++     */
++    public String readAll() {
++        if (!scanner.hasNextLine())
++            return "";
++
++        String result = scanner.useDelimiter(EVERYTHING_PATTERN).next();
++        // not that important to reset delimeter, since now scanner is empty
++        scanner.useDelimiter(WHITESPACE_PATTERN); // but let's do it anyway
++        return result;
++    }
++
++    /**
++     * Reads the next token from this input stream and returns it as a <tt>String</tt>.
++     *
++     * @return the next <tt>String</tt> in this input stream
++     */
++    public String readString() {
++        return scanner.next();
++    }
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>int</tt>,
++     * and returns the <tt>int</tt>.
++     *
++     * @return the next <tt>int</tt> in this input stream
++     */
++    public int readInt() {
++        return scanner.nextInt();
++    }
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>double</tt>,
++     * and returns the <tt>double</tt>.
++     *
++     * @return the next <tt>double</tt> in this input stream
++     */
++    public double readDouble() {
++        return scanner.nextDouble();
++    }
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>float</tt>,
++     * and returns the <tt>float</tt>.
++     *
++     * @return the next <tt>float</tt> in this input stream
++     */
++    public float readFloat() {
++        return scanner.nextFloat();
++    }
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>long</tt>,
++     * and returns the <tt>long</tt>.
++     *
++     * @return the next <tt>long</tt> in this input stream
++     */
++    public long readLong() {
++        return scanner.nextLong();
++    }
++
++    ///// end: section (2 of 2) of code duplicated from In to StdIn */
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>short</tt>,
++     * and returns the <tt>short</tt>.
++     *
++     * @return the next <tt>short</tt> in this input stream
++     */
++    public short readShort() {
++        return scanner.nextShort();
++    }
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>byte</tt>,
++     * and returns the <tt>byte</tt>.
++     * <p>
++     * To read binary data, use {@link BinaryIn}.
++     *
++     * @return the next <tt>byte</tt> in this input stream
++     */
++    public byte readByte() {
++        return scanner.nextByte();
++    }
++
++    /**
++     * Reads the next token from this input stream, parses it as a <tt>boolean</tt>
++     * (interpreting either <tt>"true"</tt> or <tt>"1"</tt> as <tt>true</tt>,
++     * and either <tt>"false"</tt> or <tt>"0"</tt> as <tt>false</tt>).
++     *
++     * @return the next <tt>boolean</tt> in this input stream
++     */
++    public boolean readBoolean() {
++        String s = readString();
++        if (s.equalsIgnoreCase("true")) return true;
++        if (s.equalsIgnoreCase("false")) return false;
++        if (s.equals("1")) return true;
++        if (s.equals("0")) return false;
++        throw new InputMismatchException();
++    }
++
++    /**
++     * Reads all remaining tokens from this input stream and returns them as
++     * an array of strings.
++     *
++     * @return all remaining tokens in this input stream, as an array of strings
++     */
++    public String[] readAllStrings() {
++        // we could use readAll.trim().split(), but that's not consistent
++        // since trim() uses characters 0x00..0x20 as whitespace
++        String[] tokens = WHITESPACE_PATTERN.split(readAll());
++        if (tokens.length == 0 || tokens[0].length() > 0)
++            return tokens;
++        String[] decapitokens = new String[tokens.length - 1];
++        for (int i = 0; i < tokens.length - 1; i++)
++            decapitokens[i] = tokens[i + 1];
++        return decapitokens;
++    }
++
++    /**
++     * Reads all remaining lines from this input stream and returns them as
++     * an array of strings.
++     *
++     * @return all remaining lines in this input stream, as an array of strings
++     */
++    public String[] readAllLines() {
++        ArrayList<String> lines = new ArrayList<String>();
++        while (hasNextLine()) {
++            lines.add(readLine());
++        }
++        return lines.toArray(new String[0]);
++    }
++
++    /**
++     * Reads all remaining tokens from this input stream, parses them as integers,
++     * and returns them as an array of integers.
++     *
++     * @return all remaining lines in this input stream, as an array of integers
++     */
++    public int[] readAllInts() {
++        String[] fields = readAllStrings();
++        int[] vals = new int[fields.length];
++        for (int i = 0; i < fields.length; i++)
++            vals[i] = Integer.parseInt(fields[i]);
++        return vals;
++    }
++
++    /**
++     * Reads all remaining tokens from this input stream, parses them as doubles,
++     * and returns them as an array of doubles.
++     *
++     * @return all remaining lines in this input stream, as an array of doubles
++     */
++    public double[] readAllDoubles() {
++        String[] fields = readAllStrings();
++        double[] vals = new double[fields.length];
++        for (int i = 0; i < fields.length; i++)
++            vals[i] = Double.parseDouble(fields[i]);
++        return vals;
++    }
++
++    /**
++     * Closes this input stream.
++     */
++    public void close() {
++        scanner.close();
++    }
++
++}
++
++/******************************************************************************
++ *  Copyright 2002-2015, Robert Sedgewick and Kevin Wayne.
++ *
++ *  This file is part of algs4.jar, which accompanies the textbook
++ *
++ *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,
++ *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.
++ *      http://algs4.cs.princeton.edu
++ *
++ *
++ *  algs4.jar is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  algs4.jar is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.
++ ******************************************************************************/
