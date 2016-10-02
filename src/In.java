@@ -319,7 +319,6 @@ public final class In {
     public int readInt() {
         return scanner.nextInt();
     }
-
    /**
      * Reads the next token from this input stream, parses it as a <tt>double</tt>,
      * and returns the <tt>double</tt>.

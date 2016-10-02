@@ -6,8 +6,8 @@ public class Node {
     public double H = 0;//"Direction" to end point
     public double F = 0;//G+H = F
     public double P = 0;//probbilty
-    public int x; //coordinates x
-    public int y;//coordinates y
+    public double x; //coordinates x
+    public double y;//coordinates y
     public Node parent;
     public int N;//number
 

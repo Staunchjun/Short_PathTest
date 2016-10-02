@@ -1,81 +1,193 @@
 import java.util.*;
-import java.util.Map;
 
 /**
  * Created by ruan on 9/12/16.
  */
 public class A_star {
-    public void printPath(Graph map, Node s, Node d) {
+
+    private void showBus(Map<Double, ArrayList> all_bus) {
+        for (Map.Entry<Double, ArrayList> bus : all_bus.entrySet()) {
+            ArrayList stack = bus.getValue();
+            if (stack == null) {
+                System.out.print("impossible to reach");
+            } else {
+                Iterator iterator = stack.iterator();
+                while (iterator.hasNext()) {
+                    Node temp = (Node) iterator.next();
+                    System.out.print(temp.N + " <-");
+
+                }
+                System.out.println();
+
+            }
+        }
+    }
+
+    public void printPath2(Graph_arraylist map, Node s, Node d) {
         PointComparator pointComparator = new PointComparator();
         PriorityQueue priorityQueue = new PriorityQueue(map.getV(), pointComparator);
-        Map<Double,ArrayList> all_bus = new HashMap<Double,ArrayList>();
+        PriorityQueue closeQueue = new PriorityQueue(map.getV(), pointComparator);
+        Map<Double, ArrayList> all_path = new HashMap<Double, ArrayList>();
         s.G =0;
-        s.H =0;
+        s.H = Node.getDis(s, d);
         s.F =s.G+s.H;
         s.parent = null;
+        boolean flag = true;
         priorityQueue.offer(s);
         while (!priorityQueue.isEmpty())
         {
             Node n = (Node) priorityQueue.poll();
+            closeQueue.add(n);
             for (int i :map.return_adj(n.N)) {
-                Node next_n = map.getNodeMap().get(i);
+                Node next_n = map.getNodes().get(i);
 
                 double temp_G = n.G+Node.getDis(n,next_n);
                 double temp_H = Node.getDis(next_n, d);
                 double temp_F =temp_G+temp_H;
 
+                ArrayList<Node> arrayList = null;
                 if (next_n.N == d.N)
                 {
-                    next_n.G=(temp_G);
-                    next_n.H=(temp_H);
-                    next_n.F=(temp_F);
+                    next_n.G = temp_G;
+                    next_n.H = temp_H;
+                    next_n.F = temp_F;
                     d.parent = n;
                     Node node = d;
-                    ArrayList<Node> arrayList = new ArrayList();
+
+                    arrayList = new ArrayList();
+
                     while (node != null)
                     {
                         arrayList.add(node);
                         node = node.parent;
                     }
-                    all_bus.put(map.getNodeMap().get(6).G,arrayList);
+                    all_path.put(map.getNodes().get(d.N).G, arrayList);
 
                     break;
                 }
 
-             //这里有问题不知道为什么当arrayList.add(node);添加完结后，继续第二轮数据会出现变动？？
+                //这里有问题不知道为什么当arrayList.add(node);添加完结后，继续第二轮数据会出现变动？？
                 if (priorityQueue.contains(next_n)) {
-                    Iterator iterator = priorityQueue.iterator();
-                    Node point = null;
-                    while (iterator.hasNext()) {
-                        point = (Node) iterator.next();
-                        if (point.N==next_n.N)
-                        {
-                          break;
-                        }
+                    Node old_point = getNodeFromPq(priorityQueue, next_n);
+                    if (temp_F < old_point.F) {
+                        updatePq(priorityQueue, n, next_n, temp_G, temp_H, temp_F, old_point);
+                    } else {
+                        continue;
                     }
-                    if (temp_F < point.F) {
-                        priorityQueue.remove(point);
-                        next_n.G=temp_G;
-                        next_n.H=temp_H;
-                        next_n.F=temp_F;
-                        priorityQueue.offer(next_n);
-                        next_n.parent = n;
+                } else if (closeQueue.contains(next_n)) {
+                    Node old_point = getNodeFromPq(closeQueue, next_n);
+                    if (temp_F < old_point.F) {
+                        updatePq(closeQueue, n, next_n, temp_G, temp_H, temp_F, old_point);
+                    } else {
+                        continue;
                     }
                 } else {
-
-                    next_n.G=temp_G;
-                    next_n.H=temp_H;
-                    next_n.F=temp_F;
-                    priorityQueue.offer(next_n);
-                    next_n.parent = n;
+                    insertPq(priorityQueue, n, next_n, temp_G, temp_H, temp_F);
                 }
             }
 
         }
-        
-        ChooseBestPath2(all_bus);
+
+        if (d.parent == null) {
+            all_path.put(0.0, null);
+        }
+        ChooseBestPath2(all_path);
+        showBus(all_path);
 
     }
+
+    public void printPath(Graph_arraylist map, Node s, Node d) {
+        PointComparator pointComparator = new PointComparator();
+        PriorityQueue priorityQueue = new PriorityQueue(map.getV(), pointComparator);
+        PriorityQueue closeQueue = new PriorityQueue(map.getV(), pointComparator);
+        Map<Double, ArrayList> all_path = new HashMap<Double, ArrayList>();
+        s.G = 0;
+        s.H = Node.getDis(s, d);
+        s.F = s.G + s.H;
+        s.parent = null;
+        priorityQueue.offer(s);
+        while (!priorityQueue.isEmpty()) {
+            Node n = (Node) priorityQueue.poll();
+            closeQueue.add(n);
+            for (int i : map.return_adj(n.N)) {
+                Node next_n = map.getNodes().get(i);
+
+                double temp_G = n.G + Node.getDis(n, next_n);
+                double temp_H = Node.getDis(next_n, d);
+                double temp_F = temp_G + temp_H;
+
+                ArrayList<Node> arrayList = null;
+                if (next_n.N == d.N) {
+                    next_n.G=temp_G;
+                    next_n.H=temp_H;
+                    next_n.F=temp_F;
+                    d.parent = n;
+                    Node node = d;
+
+                    arrayList = new ArrayList();
+
+                    while (node != null) {
+                        arrayList.add(node);
+                        node = node.parent;
+                    }
+                    all_path.put(map.getNodes().get(d.N).G, arrayList);
+
+                    break;
+                }
+                if (priorityQueue.contains(next_n)) {
+                    Node old_point = getNodeFromPq(priorityQueue, next_n);
+                    if (temp_F < old_point.F) {
+                        updatePq(priorityQueue, n, next_n, temp_G, temp_H, temp_F, old_point);
+                    } else {
+                        continue;
+                    }
+                } else if (closeQueue.contains(next_n)) {
+                    Node old_point = getNodeFromPq(closeQueue, next_n);
+                    if (temp_F < old_point.F) {
+                        updatePq(closeQueue, n, next_n, temp_G, temp_H, temp_F, old_point);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    insertPq(priorityQueue, n, next_n, temp_G, temp_H, temp_F);
+                }
+            }
+
+        }
+
+        if (d.parent == null) {
+            all_path.put(0.0, null);
+        }
+        ChooseBestPath2(all_path);
+        showBus(all_path);
+
+    }
+
+    private void insertPq(PriorityQueue priorityQueue, Node n, Node next_n, double temp_G, double temp_H, double temp_F) {
+        next_n.G = temp_G;
+        next_n.H = temp_H;
+        next_n.F = temp_F;
+        priorityQueue.offer(next_n);
+        next_n.parent = n;
+    }
+
+    private void updatePq(PriorityQueue closeQueue, Node n, Node next_n, double temp_G, double temp_H, double temp_F, Node old_point) {
+        closeQueue.remove(old_point);
+        insertPq(closeQueue, n, next_n, temp_G, temp_H, temp_F);
+    }
+
+    private Node getNodeFromPq(PriorityQueue closeQueue, Node next_n) {
+        Iterator iterator = closeQueue.iterator();
+        Node old_point = null;
+        while (iterator.hasNext()) {
+            old_point = (Node) iterator.next();
+            if (old_point.N == next_n.N) {
+                break;
+            }
+        }
+        return old_point;
+    }
+
     private void ChooseBestPath2(Map<Double, ArrayList> all_bus) {
         GComparator gcomp = new GComparator();
         UComparator ucomp = new UComparator();
@@ -100,6 +212,7 @@ public class A_star {
 
         while(!g_pq.isEmpty()) {
             Bus temp_bus = (Bus) g_pq.poll();
+            u_pq.add(min_bus);
             if (min_bus.G + L > temp_bus.G)
             {
 
@@ -111,6 +224,7 @@ public class A_star {
 
         System.out.println("the sum of u is :" +max_u_bus.U);
         System.out.println("the sum of dis is :"+max_u_bus.G);
+        System.out.print("the best path:");
         ArrayList stack = all_bus.get(max_u_bus.G);
         if (stack == null)
         {
@@ -128,90 +242,8 @@ public class A_star {
             System.out.println();
 
         }
+        System.out.println("-----------------------------------------------");
     }
-    //Try to  get the upper left corner ,create a division ,take apart ,just get the point at left region ,and on the left region,we get the max u
-    private void ChooseBestPath(Map<Double, ArrayList> all_bus) {
-        double Cut_off  = 0;
-        UComparator ucomp = new UComparator();
-        PriorityQueue u_pq = new PriorityQueue(all_bus.size(), ucomp);
-        for (Map.Entry<Double,ArrayList> stack :all_bus.entrySet() ) {
-
-
-               Cut_off =   Cut_off + stack.getKey();
-
-            }
-            Cut_off = Cut_off/all_bus.size();
-        for (Map.Entry<Double,ArrayList> stack :all_bus.entrySet() )
-        {
-            double u =0;
-            if (stack.getKey() <= Cut_off)
-            {
-                Iterator iterator = stack.getValue().iterator();
-                while (iterator.hasNext())
-                {
-                    Node temp = (Node) iterator.next();
-                    u = u + temp.P;
-
-                }
-                Bus bus = new Bus(stack.getKey(),u);
-                u_pq.offer(bus);
-            }
-        }
-        //get the left uperr point
-        double L = 0.25;
-        ArrayList<Bus> standby_bus = new ArrayList();
-        while (!u_pq.isEmpty()) {
-            Bus min_bus = (Bus) u_pq.poll();
-            Iterator iterator = u_pq.iterator();
-            if (!iterator.hasNext())
-            {
-                standby_bus.add(min_bus);
-            }
-            while (iterator.hasNext()) {
-                Bus temp_bus = (Bus) iterator.next();
-                if (min_bus.G+L > temp_bus.G && temp_bus.G > min_bus.G-L)
-                {
-                 if (min_bus.U < temp_bus.U)
-                 {
-                     standby_bus.add(temp_bus);
-                 }
-                 else
-                 {
-                     standby_bus.add(min_bus);
-                 }
-                }
-                else
-                {
-                    standby_bus.add(min_bus);
-                }
-            }
-        }
-//        Bus s_bus = (Bus) u_pq.poll();
-        for (Bus s_bus:standby_bus) {
-
-        System.out.println("the sum of u is :" +s_bus.U);
-        System.out.println("the sum of dis is :"+s_bus.G);
-         ArrayList stack = all_bus.get(s_bus.G);
-        if (stack == null)
-            {
-                System.out.print("impossible to reach");
-            }
-            else
-            {
-                Iterator iterator = stack.iterator();
-                while (iterator.hasNext())
-                {
-                    Node temp = (Node) iterator.next();
-                    System.out.print(temp.N+" <-");
-
-                }
-                System.out.println();
-
-            }
-        }
-
-    }
-
 
      class UComparator implements Comparator<Bus> {
         @Override

@@ -37,8 +37,8 @@ public class Graph {
        for (int i = 0; i <V ; i++) {
            Node node = new Node();
            node.N = in.readInt();
-           node.x =in.readInt();
-           node.y =in.readInt();
+           node.x = in.readDouble();
+           node.y = in.readDouble();
            node.P =in.readDouble();
            nodeMap.put(node.N,node);
        }
