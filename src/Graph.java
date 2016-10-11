@@ -1,54 +1,54 @@
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ruan on 9/12/16.
  */
 public class Graph {
 
-    private java.util.Map<Integer,Node> nodeMap = null;
-
-    public java.util.Map<Integer, Node> getNodeMap() {
-        return nodeMap;
-    }
+    private int V;
+    private int E;
+    private List<Node> nodes = null;
 
     public int getV() {
         return V;
     }
 
-    private int V;
-    private int E;
-    public Bag<Integer>[] adj;
-
-   public  Graph(In in)
-   {
-       V = in.readInt();
-       E = in.readInt();
-       adj = (Bag<Integer>[]) new Bag[V];
-       nodeMap = new HashMap<Integer,Node>();
-       for (int v = 0; v < V; v++) {
-           adj[v] = new Bag<Integer>();
-       }
-       for (int i = 0; i <E ; i++) {
-           int s = in.readInt();
-           int d = in.readInt();
-           addEdge(s,d);
-       }
-       for (int i = 0; i <V ; i++) {
-           Node node = new Node();
-           node.N = in.readInt();
-           node.x = in.readDouble();
-           node.y = in.readDouble();
-           node.P =in.readDouble();
-           nodeMap.put(node.N,node);
-       }
-   }
-    public Iterable<Integer> return_adj(int v) {
-        return adj[v];
+    public int getE() {
+        return E;
     }
 
-    private void addEdge(int s, int d) {
-        adj[s].add(d);
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public Node getNode(int index) {
+        return nodes.get(index);
+    }
+
+    public Graph(In in) {
+        V = in.readInt();
+        nodes = new ArrayList<Node>(V);
+        for (int i = 0; i < V; i++) {
+            nodes.add(i, new Node());
+        }
+        E = in.readInt();
+        for (int i = 0; i < E; i++) {
+            int s = in.readInt();
+            int d = in.readInt();
+            nodes.get(s).addNeighbor(nodes.get(d));
+//            nodes.get(s).adjEdge.add(new Edge(nodes.get(s),nodes.get(d)));
+
+        }
+        for (int i = 0; i < V; i++) {
+            int n = in.readInt();
+            Node node = nodes.get(n);
+            node.N = n;
+            node.x = in.readDouble();
+            node.y = in.readDouble();
+            node.P = in.readDouble();
+        }
     }
 
 }
