@@ -8,7 +8,7 @@ class Edge {
     private Node d;
 
     public Edge(Node s, Node d, float utility) {
-        cost = (float) getDis(s, d);
+        cost = (float) Util.getDis(s, d);
         this.utility = utility;
     }
 
@@ -16,9 +16,5 @@ class Edge {
         return d;
     }
 
-    public double getDis(Node p1, Node p2) {
-        double dis = Math.sqrt(Math.abs(p1.x - p2.x) * Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y) * Math.abs(p1.y - p2.y));
-        return dis;
-    }
 
 }

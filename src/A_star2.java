@@ -4,29 +4,26 @@ import java.util.*;
  * Created by ruan on 9/12/16.
  */
 public class A_star2 {
-    double L = 0;
+    private double L = 0;
     private static long Strat;
     private static long End;
     private boolean isFirstPath = true;
     private List<ArrayList<Node>> allPaths;
-    //    private ArrayList<Node> bestPath;
     private Path bestPath;
-    //    private float cost , utility;
+    private Path shortestPath;
     private Graph graph;
     private double f[], g[], h[];
-//    private Node parent[];
 
-
+    //init data
     public A_star2(Graph graph) {
         allPaths = new ArrayList<ArrayList<Node>>();
         this.graph = graph;
         f = new double[graph.getV()];
         g = new double[graph.getV()];
         h = new double[graph.getV()];
-//        parent = new Node[graph.getE()];
     }
 
-    private void showPath(Path bestPath) {
+    private void ShowPath(Path bestPath) {
 
         ArrayList stack = bestPath.stack;
         if (stack == null) {
@@ -36,8 +33,8 @@ public class A_star2 {
             while (iterator.hasNext()) {
                 Node temp = (Node) iterator.next();
                 System.out.print(temp.N + " <-");
-
             }
+
             System.out.println();
             System.out.println("cost:" + bestPath.G);
             System.out.println("utility:" + bestPath.U);
@@ -45,7 +42,7 @@ public class A_star2 {
         }
     }
 
-    private void savePath(Node node) {
+    private void SavePath(Node node) {
         ArrayList<Node> path = new ArrayList();
 
         float tempCost = (float) g[node.N];
@@ -60,14 +57,19 @@ public class A_star2 {
             }
 
         }
+        //tempPath is used to compare Cost and Utility
         Path tempPath = new Path(tempCost, tempUtility, path);
+        //store path
         allPaths.add(path);
+
         if (isFirstPath) {
-            bestPath = tempPath;
-            L = bestPath.G * 10025;
+            shortestPath = tempPath;
+            bestPath = shortestPath;
+            //threshold
+            L = bestPath.G * 0.5;
         } else {
             if (bestPath != null) {
-                if (bestPath.G + L > tempPath.G && bestPath.U < tempPath.U) {
+                if (shortestPath.G + L > tempPath.G && bestPath.U < tempPath.U) {
                     bestPath = tempPath;
                 }
             } else {
@@ -82,7 +84,7 @@ public class A_star2 {
         PriorityQueue closeQueue = new PriorityQueue(graph.getV(), pointComparator);
 
         g[s.N] = 0;
-        h[s.N] = (float) getDis(s, d);
+        h[s.N] = (float) Util.getDis(s, d);
         f[s.N] = g[s.N] + h[s.N];
 
         s.parent = null;
@@ -91,8 +93,8 @@ public class A_star2 {
             Node n = (Node) priorityQueue.poll();
             closeQueue.add(n);
             for (Node nn : n.getNeighbors()) {
-                double temp_G = g[n.N] + getDis(n, nn);
-                double temp_H = getDis(nn, d);
+                double temp_G = g[n.N] + Util.getDis(n, nn);
+                double temp_H = Util.getDis(nn, d);
                 double temp_F = temp_G + temp_H;
 
                 if (nn.N == d.N) {
@@ -103,7 +105,7 @@ public class A_star2 {
 
                     d.parent = n;
                     Node node = d;
-                    savePath(node);
+                    SavePath(node);
                     isFirstPath = false;
 
                     break;
@@ -132,7 +134,7 @@ public class A_star2 {
         if (d.parent == null) {
             allPaths.add(null);
         }
-        showPath(bestPath);
+        ShowPath(bestPath);
         showPath2(allPaths);
     }
 
@@ -175,11 +177,6 @@ public class A_star2 {
                 return 1;
             }
         }
-    }
-
-    public double getDis(Node p1, Node p2) {
-        double dis = Math.sqrt(Math.abs(p1.x - p2.x) * Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y) * Math.abs(p1.y - p2.y));
-        return dis;
     }
 
     public static void main(String args[]) {

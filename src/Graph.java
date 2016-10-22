@@ -51,21 +51,20 @@ public class Graph {
         }
     }
 
-    public Graph(List<EdgeBean> edgeBeens, List<MapNode> mapNodes) {
-        V = mapNodes.size() + 1;
-        E = edgeBeens.size();
-        nodes = new ArrayList<Node>(V + 1);
+    public Graph(List<EdgeBean> EdgeBean, List<MapNode> NodesBean) {
+        V = NodesBean.size() + 1;// add node 0
+        E = EdgeBean.size();
 
-
-        nodes.add(0, new Node());
+        this.nodes = new ArrayList<Node>(V);
+        this.nodes.add(0, new Node());//add node 0 in case the error
+        //init nodes
         for (int i = 1; i <= V; i++) {
-            nodes.add(i, new Node());
+            this.nodes.add(i, new Node());
         }
-
-
-        for (MapNode mapNode : mapNodes) {
+        //read Node data
+        for (MapNode mapNode : NodesBean) {
             int n = mapNode.getId();
-            Node node = nodes.get(n);
+            Node node = this.nodes.get(n);
             node.N = n;
             String corrdinate = mapNode.getSt_astext();
             String[] strings = corrdinate.split(" ");
@@ -76,17 +75,18 @@ public class Graph {
             node.x = new Double(x);
             node.y = new Double(Y);
         }
-
-        for (EdgeBean beann : edgeBeens) {
+        //read Edge data
+        for (EdgeBean beann : EdgeBean) {
 
             List<Integer> adjNode = beann.getAdjNode();
-            int s = adjNode.get(0);
-            int d = adjNode.get(1);
 
-            nodes.get(s).addNeighbor(nodes.get(d));
-            nodes.get(s).addEdge(nodes.get(d).N, new Edge(nodes.get(s), nodes.get(d), beann.getSumutility()));
-            nodes.get(d).addNeighbor(nodes.get(s));
-            nodes.get(d).addEdge(nodes.get(s).N, new Edge(nodes.get(d), nodes.get(s), beann.getSumutility()));
+            int s = adjNode.get(0);//from
+            int d = adjNode.get(1);//to
+
+            this.nodes.get(s).addNeighbor(this.nodes.get(d));
+            this.nodes.get(s).addEdge(this.nodes.get(d).N, new Edge(this.nodes.get(s), this.nodes.get(d), beann.getSumutility()));
+            this.nodes.get(d).addNeighbor(this.nodes.get(s));
+            this.nodes.get(d).addEdge(this.nodes.get(s).N, new Edge(this.nodes.get(d), this.nodes.get(s), beann.getSumutility()));
 
         }
 

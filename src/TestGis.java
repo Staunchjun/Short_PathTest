@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class TestGis {
 
+    private static Graph graph = null;
     private static Connection conn;
 
     public static void init() throws Exception {
@@ -19,32 +20,24 @@ public class TestGis {
 
 //        ResultSet s_node = stmt.executeQuery("SELECT array_to_json(array_agg(t)) FROM Node As t;");
 
-        ResultSet s_edge = stmt.executeQuery("select row_to_json(t)  from edge as t;");
+        ResultSet s_edge = stmt.executeQuery("select row_to_json(t)  from edge as t ;");
         List<EdgeBean> beanns = new ArrayList<EdgeBean>();
         Gson gson = new Gson();
         while (s_edge.next()) {
-            EdgeBean bean = new EdgeBean();
-            bean = gson.fromJson(s_edge.getString(1), EdgeBean.class);
+            EdgeBean bean = gson.fromJson(s_edge.getString(1), EdgeBean.class);
             beanns.add(bean);
         }
-        for (EdgeBean beann : beanns) {
-            System.out.println(beann.getAdjNode());
-        }
-
 
         ResultSet s_node = stmt.executeQuery("select row_to_json(t)  FROM (select id, ST_ASTEXT(the_geom) from Node) As t");
         List<MapNode> MapNodeBeanns = new ArrayList<MapNode>();
         while (s_node.next()) {
-            MapNode bean = new MapNode();
-            bean = gson.fromJson(s_node.getString(1), MapNode.class);
+            MapNode bean = gson.fromJson(s_node.getString(1), MapNode.class);
             MapNodeBeanns.add(bean);
         }
 
         stmt.close();
 
-        Graph graph = new Graph(beanns, MapNodeBeanns);
-        A_star2 a_star = new A_star2(graph);
-        a_star.runA_star(graph, graph.getNodes().get(4), graph.getNodes().get(15));
+        graph = new Graph(beanns, MapNodeBeanns);
 
     }
 
@@ -53,9 +46,16 @@ public class TestGis {
             conn.close();
         }
     }
-
     public static void main(String args[]) throws Exception {
+        long total = Runtime.getRuntime().maxMemory();
+        long Strat = System.currentTimeMillis();
         init();
+        A_star2 a_star = new A_star2(graph);
+        a_star.runA_star(graph, graph.getNodes().get(4), graph.getNodes().get(15));
+        long End = System.currentTimeMillis();
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        System.out.println("the total time is " + (End - Strat) + " nanoseconds");
+        System.out.println("the required memory is " + (total - freeMemory) / (1024) + "kb");
     }
 
 }

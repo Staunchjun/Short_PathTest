@@ -13,8 +13,8 @@ public class Node {
     public double P = 0;//probability
 
     // For A*
-//    public double G = 0;//real cost
-//    public double H = 0;//"Direction" to end point
+    //    public double G = 0;//real cost
+    //    public double H = 0;//"Direction" to end point
     public double F = 0;//G+H = F
     public Node parent;
 
