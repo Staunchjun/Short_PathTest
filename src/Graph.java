@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +26,7 @@ public class Graph {
         return nodes.get(index);
     }
 
+
     public Graph(In in) {
         V = in.readInt();
         nodes = new ArrayList<Node>(V);
@@ -49,6 +49,48 @@ public class Graph {
             node.y = in.readDouble();
             node.P = in.readDouble();
         }
+    }
+
+    public Graph(List<EdgeBean> edgeBeens, List<MapNode> mapNodes) {
+        V = mapNodes.size() + 1;
+        E = edgeBeens.size();
+        nodes = new ArrayList<Node>(V + 1);
+
+
+        nodes.add(0, new Node());
+        for (int i = 1; i <= V; i++) {
+            nodes.add(i, new Node());
+        }
+
+
+        for (MapNode mapNode : mapNodes) {
+            int n = mapNode.getId();
+            Node node = nodes.get(n);
+            node.N = n;
+            String corrdinate = mapNode.getSt_astext();
+            String[] strings = corrdinate.split(" ");
+            String[] X_array = strings[0].replace('(', 'A').split("A");
+            String x = X_array[1];
+            String[] Y_array = strings[1].replace(')', 'A').split("A");
+            String Y = Y_array[0];
+            node.x = new Double(x);
+            node.y = new Double(Y);
+        }
+
+        for (EdgeBean beann : edgeBeens) {
+
+            List<Integer> adjNode = beann.getAdjNode();
+            int s = adjNode.get(0);
+            int d = adjNode.get(1);
+
+            nodes.get(s).addNeighbor(nodes.get(d));
+            nodes.get(s).addEdge(nodes.get(d).N, new Edge(nodes.get(s), nodes.get(d), beann.getSumutility()));
+            nodes.get(d).addNeighbor(nodes.get(s));
+            nodes.get(d).addEdge(nodes.get(s).N, new Edge(nodes.get(d), nodes.get(s), beann.getSumutility()));
+
+        }
+
+
     }
 
 }

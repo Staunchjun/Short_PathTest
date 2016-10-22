@@ -3,7 +3,7 @@ import java.util.*;
 /**
  * Created by ruan on 9/12/16.
  */
-public class A_star1 {
+public class A_star2 {
     double L = 0;
     private static long Strat;
     private static long End;
@@ -17,7 +17,7 @@ public class A_star1 {
 //    private Node parent[];
 
 
-    public A_star1(Graph graph) {
+    public A_star2(Graph graph) {
         allPaths = new ArrayList<ArrayList<Node>>();
         this.graph = graph;
         f = new double[graph.getV()];
@@ -51,9 +51,14 @@ public class A_star1 {
         float tempCost = (float) g[node.N];
         float tempUtility = 0;
         while (node != null) {
-            tempUtility = (float) (tempUtility + node.P);
+            Node FromNode = node;
             path.add(node);
             node = node.parent;
+            Node ToNode = node;
+            if (ToNode != null) {
+                tempUtility = (float) (tempUtility + FromNode.getAdjEdge().get(ToNode.N).utility);
+            }
+
         }
         Path tempPath = new Path(tempCost, tempUtility, path);
         allPaths.add(path);

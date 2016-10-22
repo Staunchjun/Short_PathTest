@@ -2,14 +2,14 @@
 /**
  * Created by ruan on 16-10-10.
  */
-public class Edge {
+class Edge {
     public float cost, utility;
     private Node s;
     private Node d;
 
-    public Edge(Node s, Node d) {
+    public Edge(Node s, Node d, float utility) {
         cost = (float) getDis(s, d);
-        utility = (float) sumUtility(s, d);
+        this.utility = utility;
     }
 
     public Node other() {
@@ -21,8 +21,4 @@ public class Edge {
         return dis;
     }
 
-    public double sumUtility(Node p1, Node p2) {
-        double utility = p1.P + p2.P;
-        return utility;
-    }
 }
