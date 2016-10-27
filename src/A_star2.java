@@ -66,7 +66,7 @@ public class A_star2 {
             shortestPath = tempPath;
             bestPath = shortestPath;
             //threshold
-            L = bestPath.G * 0.5;
+            L = bestPath.G * 0.25;
         } else {
             if (bestPath != null) {
                 if (shortestPath.G + L > tempPath.G && bestPath.U < tempPath.U) {
@@ -85,17 +85,21 @@ public class A_star2 {
 
         g[s.N] = 0;
         h[s.N] = (float) Util.getDis(s, d);
+//        h[s.N] = 0;
         f[s.N] = g[s.N] + h[s.N];
 
         s.parent = null;
         priorityQueue.offer(s);
+
         while (!priorityQueue.isEmpty()) {
             Node n = (Node) priorityQueue.poll();
             closeQueue.add(n);
+
             for (Node nn : n.getNeighbors()) {
                 double temp_G = g[n.N] + Util.getDis(n, nn);
                 double temp_H = Util.getDis(nn, d);
                 double temp_F = temp_G + temp_H;
+                //使用树结构的形式存储每一条路径
 
                 if (nn.N == d.N) {
                     nn.F = temp_F;
@@ -107,8 +111,8 @@ public class A_star2 {
                     Node node = d;
                     SavePath(node);
                     isFirstPath = false;
-
-                    break;
+                    continue;
+//                    break;
                 }
                 if (priorityQueue.contains(nn)) {
                     Node old_point = getNodeFromPq(priorityQueue, nn);
@@ -147,6 +151,7 @@ public class A_star2 {
 
         priorityQueue.offer(next_n);
         next_n.parent = n;
+
     }
 
     private void updatePq(PriorityQueue closeQueue, Node n, Node next_n, double temp_G, double temp_H, double temp_F, Node old_point) {

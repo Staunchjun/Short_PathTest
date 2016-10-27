@@ -56,7 +56,9 @@ public class Graph {
         E = EdgeBean.size();
 
         this.nodes = new ArrayList<Node>(V);
-        this.nodes.add(0, new Node());//add node 0 in case the error
+        for (int j = 0; j < 1; j++) {
+            this.nodes.add(0, new Node());//add node 0 in case the error
+        }
         //init nodes
         for (int i = 1; i <= V; i++) {
             this.nodes.add(i, new Node());
@@ -84,9 +86,9 @@ public class Graph {
             int d = adjNode.get(1);//to
 
             this.nodes.get(s).addNeighbor(this.nodes.get(d));
-            this.nodes.get(s).addEdge(this.nodes.get(d).N, new Edge(this.nodes.get(s), this.nodes.get(d), beann.getSumutility()));
+            this.nodes.get(s).addEdge(this.nodes.get(d).N, new Edge(this.nodes.get(s), this.nodes.get(d), beann.getUtility()));
             this.nodes.get(d).addNeighbor(this.nodes.get(s));
-            this.nodes.get(d).addEdge(this.nodes.get(s).N, new Edge(this.nodes.get(d), this.nodes.get(s), beann.getSumutility()));
+            this.nodes.get(d).addEdge(this.nodes.get(s).N, new Edge(this.nodes.get(d), this.nodes.get(s), beann.getUtility()));
 
         }
 

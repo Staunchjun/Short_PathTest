@@ -12,7 +12,7 @@ class EdgeBean {
      */
 
     private int id;
-    private int sumutility;
+    private int Utility;
     private String the_geom;
     private List<Integer> AdjNode;
 
@@ -24,12 +24,12 @@ class EdgeBean {
         this.id = id;
     }
 
-    public int getSumutility() {
-        return sumutility;
+    public int getUtility() {
+        return Utility;
     }
 
-    public void setSumutility(int sumutility) {
-        this.sumutility = sumutility;
+    public void setUtility(int sumutility) {
+        this.Utility = sumutility;
     }
 
     public String getThe_geom() {
