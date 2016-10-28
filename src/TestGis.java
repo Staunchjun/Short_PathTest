@@ -14,7 +14,7 @@ public class TestGis {
 
     public static void init() throws Exception {
         Class.forName("org.postgresql.Driver");
-        String url = "jdbc:postgresql://localhost:5432/MyMap";
+        String url = "jdbc:postgresql://localhost:5432/SuperMarket";
         conn = DriverManager.getConnection(url, "postgres", "123");
         Statement stmt = conn.createStatement();
 
@@ -51,7 +51,7 @@ public class TestGis {
         long Strat = System.currentTimeMillis();
         init();
         A_star3 a_star = new A_star3(graph);
-        a_star.runA_star(graph, graph.getNodes().get(1), graph.getNodes().get(10));
+        a_star.runA_star(graph, graph.getNodes().get(210), graph.getNodes().get(200));
         long End = System.currentTimeMillis();
         long freeMemory = Runtime.getRuntime().freeMemory();
         System.out.println("the total time is " + (End - Strat) + " nanoseconds");

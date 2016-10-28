@@ -7,24 +7,27 @@ public class A_star3 {
     private double L = 0;
     private static long Strat;
     private static long End;
-    private boolean isFirstPath = true;
+    private boolean isFirstPath;
     private List<ArrayList<Node>> allPaths;
     private Path bestPath;
     private Path shortestPath;
     private Graph graph;
+    private boolean isRun;
 
     //init data
     public A_star3(Graph graph) {
         allPaths = new ArrayList<ArrayList<Node>>();
         this.graph = graph;
+        this.isFirstPath = true;
+        this.isRun = true;
 
     }
 
-    private void ShowPath(Path bestPath) {
+    private void ShowBestPath(Path bestPath) {
 
         ArrayList stack = bestPath.stack;
         if (stack == null) {
-            System.out.print("impossible to reach");
+            System.out.print("There must be no best path ~~~");
         } else {
             Iterator iterator = stack.iterator();
             while (iterator.hasNext()) {
@@ -33,14 +36,15 @@ public class A_star3 {
             }
 
             System.out.println();
-            System.out.println("cost:" + bestPath.G);
-            System.out.println("utility:" + bestPath.U);
+            System.out.println("Distaance cost:" + bestPath.G);
+            System.out.println("Sum of utility:" + bestPath.U);
 
         }
     }
 
     private void SavePath(Node node) {
         ArrayList<Node> path = new ArrayList();
+
 
         float tempCost = (float) node.G;
         float tempUtility = 0;
@@ -56,23 +60,27 @@ public class A_star3 {
         }
         //tempPath is used to compare Cost and Utility
         Path tempPath = new Path(tempCost, tempUtility, path);
-        //store path
-        allPaths.add(path);
+
 
         if (isFirstPath) {
             shortestPath = tempPath;
             bestPath = shortestPath;
             //threshold
-            L = bestPath.G * 1;
+            L = bestPath.G * 2;
         } else {
             if (bestPath != null) {
-                if (shortestPath.G + L > tempPath.G && bestPath.U < tempPath.U) {
+                if (shortestPath.G + L < tempPath.G) {
+                    isRun = false;
+                } else if (shortestPath.G + L > tempPath.G && bestPath.U < tempPath.U) {
                     bestPath = tempPath;
                 }
             } else {
                 System.out.println("occur some problem！");
             }
         }
+        //store path
+        allPaths.add(path);
+
     }
 
     public void runA_star(Graph graph, Node s, Node d) {
@@ -86,7 +94,8 @@ public class A_star3 {
         s.parent = null;
         priorityQueue.offer(s);
 
-        while (!priorityQueue.isEmpty()) {
+
+        while (!priorityQueue.isEmpty() && isRun) {
             Node n = (Node) priorityQueue.poll();
             for (Node nn : n.getNeighbors()) {
                 if (!IsNParentContainNN(n, nn)) {
@@ -107,7 +116,6 @@ public class A_star3 {
                         Node node = d;
                         SavePath(node);
                         isFirstPath = false;
-                        d.parent = null;
 
                         continue;
 
@@ -117,12 +125,12 @@ public class A_star3 {
                         Node old_point = getNodeFromPq(priorityQueue, nn);
                         if (temp_F < old_point.F) {
                             updatePq(priorityQueue, n, nn, temp_G, temp_H, temp_F, old_point);
-                            Node new_nn = new Node();
-                            insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
+//                            Node new_nn = new Node();
+//                            insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
                         } else {
-//                            continue;
-                            Node new_nn = new Node();
-                            insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
+                            continue;
+//                            Node new_nn = new Node();
+//                            insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
                         }
                     } else {
                         Node new_nn = new Node();
@@ -134,11 +142,11 @@ public class A_star3 {
 
         }
 
-        if (d.parent == null) {
-            allPaths.add(null);
-        }
-        ShowPath(bestPath);
-        showPath2(allPaths);
+//        if (d.parent == null) {
+//            allPaths.add(null);
+//        }
+        ShowBestPath(bestPath);
+        ShoAllwPath(allPaths);
     }
 
     private boolean MyPqContains(PriorityQueue priorityQueue, Node nn) {
@@ -221,7 +229,8 @@ public class A_star3 {
     }
 
 
-    private void showPath2(List all_bus) {
+    private void ShoAllwPath(List all_bus) {
+        System.out.println("paths:" + (all_bus.size() - 1));
         for (Object path : all_bus) {
             ArrayList stack = (ArrayList) path;
             if (stack == null) {

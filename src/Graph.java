@@ -52,11 +52,11 @@ public class Graph {
     }
 
     public Graph(List<EdgeBean> EdgeBean, List<MapNode> NodesBean) {
-        V = NodesBean.size() + 1;// add node 0
+        V = NodesBean.size() + 36;// add node 0
         E = EdgeBean.size();
 
         this.nodes = new ArrayList<Node>(V);
-        for (int j = 0; j < 1; j++) {
+        for (int j = 0; j < 36; j++) {
             this.nodes.add(0, new Node());//add node 0 in case the error
         }
         //init nodes
