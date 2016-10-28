@@ -3,7 +3,7 @@ import java.util.*;
 /**
  * Created by ruan on 9/12/16.
  */
-public class A_star3 {
+public class A_star4 {
     private double L = 0;
     private static long Strat;
     private static long End;
@@ -15,7 +15,7 @@ public class A_star3 {
     private boolean isRun;
 
     //init data
-    public A_star3(Graph graph) {
+    public A_star4(Graph graph) {
         this.graph = graph;
         this.isFirstPath = true;
         this.isRun = true;
@@ -119,24 +119,9 @@ public class A_star3 {
                         continue;
 
                     }
-                    // We must create a copy node of original node,so that we will change nothing on original data
-////                    if (priorityQueue.contains(nn)){
-//                    if (MyPqContains(priorityQueue, nn)) {
-//                        Node old_point = getNodeFromPq(priorityQueue, nn);
-//                        if (temp_F < old_point.F) {
-////                            updatePq(priorityQueue, n, nn, temp_G, temp_H, temp_F, old_point);
-//                            Node new_nn = new Node();
-//                            insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
-//                        } else {
-////                            continue;
-//                            Node new_nn = new Node();
-//                            insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
-//                        }
-//                    } else {
-//                        Node new_nn = new Node();
-//                    }
-                        Node new_nn = new Node();
-                        insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
+
+                    Node new_nn = new Node();
+                    insertPq(priorityQueue, n, nn.clone(new_nn), temp_G, temp_H, temp_F);
                 }
 
             }
@@ -202,35 +187,6 @@ public class A_star3 {
             }
         }
     }
-//    private boolean MyPqContains(PriorityQueue priorityQueue, Node nn) {
-//        Iterator iterator = priorityQueue.iterator();
-//        while (iterator.hasNext()) {
-//            Node old_point = (Node) iterator.next();
-//            if (old_point.N == nn.N) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//
-//    private void updatePq(PriorityQueue closeQueue, Node n, Node next_n, double temp_G, double temp_H, double temp_F, Node old_point) {
-//        closeQueue.remove(old_point);
-//        insertPq(closeQueue, n, next_n, temp_G, temp_H, temp_F);
-//    }
-//
-//    private Node getNodeFromPq(PriorityQueue closeQueue, Node next_n) {
-//        Iterator iterator = closeQueue.iterator();
-//        Node old_point = null;
-//        while (iterator.hasNext()) {
-//            old_point = (Node) iterator.next();
-//            if (old_point.N == next_n.N) {
-//                break;
-//            }
-//        }
-//        return old_point;
-//    }
-
 
 
     public static void main(String args[]) {

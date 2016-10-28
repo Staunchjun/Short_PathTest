@@ -47,7 +47,7 @@ public class Graph {
             node.N = n;
             node.x = in.readDouble();
             node.y = in.readDouble();
-            node.P = in.readDouble();
+//            node.P = in.readDouble();
         }
     }
 

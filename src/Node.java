@@ -5,6 +5,7 @@ import java.util.Map;
  * Created by ruan on 9/12/16.
  */
 public class Node {
+    //Basic property
     public int N;//number
     public Bag<Node> adj;
     public Map<Integer, Edge> adjEdge;
@@ -39,13 +40,14 @@ public class Node {
         adjEdge.put(edgeto, edge);
     }
 
+    //Copy original node
     public Node clone(Node newNode) {
         newNode.N = N;
         newNode.adj = adj;
         newNode.adjEdge = adjEdge;
         newNode.x = x;
         newNode.y = y;
-        newNode.P = P;
+//        newNode.P = P;
         newNode.G = G;
         newNode.H = H;
         newNode.F = F;

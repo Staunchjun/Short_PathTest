@@ -50,8 +50,8 @@ public class TestGis {
         long total = Runtime.getRuntime().maxMemory();
         long Strat = System.currentTimeMillis();
         init();
-        A_star3 a_star = new A_star3(graph);
-        a_star.runA_star(graph, graph.getNodes().get(210), graph.getNodes().get(200));
+        A_star4 a_star = new A_star4(graph);
+        a_star.runA_star(graph, graph.getNodes().get(190), graph.getNodes().get(200));
         long End = System.currentTimeMillis();
         long freeMemory = Runtime.getRuntime().freeMemory();
         System.out.println("the total time is " + (End - Strat) + " nanoseconds");
