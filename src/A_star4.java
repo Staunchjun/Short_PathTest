@@ -26,6 +26,7 @@ public class A_star4 {
     private void ShowBestPath(Path bestPath) {
 
         ArrayList stack = bestPath.stack;
+        ArrayList edges = bestPath.edges_id;
         if (stack == null) {
             System.out.print("There must be no best path ~~~");
         } else {
@@ -40,10 +41,25 @@ public class A_star4 {
             System.out.println("Sum of utility:" + bestPath.U);
 
         }
+        System.out.print("There is a path noted by edgeId");
+        System.out.println();
+        if (edges == null) {
+            System.out.print("There must be no best path ~~~");
+        } else {
+            Iterator edge_iterator = edges.iterator();
+            while (edge_iterator.hasNext()) {
+                Integer temp = (Integer) edge_iterator.next();
+                System.out.print(temp + " <-");
+            }
+
+            System.out.println();
+
+        }
     }
 
     private void SavePath(Node node) {
         ArrayList<Node> path = new ArrayList();
+        ArrayList<Integer> path_BY_edge = new ArrayList();
 
 
         float tempCost = (float) node.G;
@@ -55,11 +71,12 @@ public class A_star4 {
             Node ToNode = node;
             if (ToNode != null) {
                 tempUtility = (float) (tempUtility + FromNode.getAdjEdge().get(ToNode.N).utility);
+                path_BY_edge.add(FromNode.getAdjEdge().get(ToNode.N).id);
             }
 
         }
         //tempPath is used to compare Cost and Utility
-        Path tempPath = new Path(tempCost, tempUtility, path);
+        Path tempPath = new Path(tempCost, tempUtility, path, path_BY_edge);
 
         // we compare the utility while running algorithm
         if (isFirstPath) {
@@ -131,6 +148,12 @@ public class A_star4 {
         ShowBestPath(bestPath);
 
         ShoAllwPathInfomation(allPathsInfomation);
+
+    }
+
+    public Path ReturnBestPath() {
+
+        return bestPath;
     }
 
     private void ShoAllwPathInfomation(List<Path> allPathsInfomation) {

@@ -7,6 +7,7 @@ public class Path {
     double G = 0;
     double U = 0;
     ArrayList<Node> stack;
+    ArrayList<Integer> edges_id;
 
     public double getG() {
         return G;
@@ -33,5 +34,12 @@ public class Path {
         G = g;
         U = u;
         this.stack = stack;
+    }
+
+    public Path(double g, double u, ArrayList<Node> nodes, ArrayList<Integer> edges) {
+        G = g;
+        U = u;
+        this.stack = nodes;
+        this.edges_id = edges;
     }
 }

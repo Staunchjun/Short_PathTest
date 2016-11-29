@@ -52,11 +52,11 @@ public class Graph {
     }
 
     public Graph(List<EdgeBean> EdgeBean, List<MapNode> NodesBean) {
-        V = NodesBean.size() + 36;// add node 0
+        V = NodesBean.size();// add node 0
         E = EdgeBean.size();
 
         this.nodes = new ArrayList<Node>(V);
-        for (int j = 0; j < 36; j++) {
+        for (int j = 0; j < 1; j++) {
             this.nodes.add(0, new Node());//add node 0 in case the error
         }
         //init nodes
@@ -80,15 +80,15 @@ public class Graph {
         //read Edge data
         for (EdgeBean beann : EdgeBean) {
 
-            List<Integer> adjNode = beann.getAdjNode();
+            List<Integer> adjNode = beann.getAdj();
 
             int s = adjNode.get(0);//from
             int d = adjNode.get(1);//to
 
             this.nodes.get(s).addNeighbor(this.nodes.get(d));
-            this.nodes.get(s).addEdge(this.nodes.get(d).N, new Edge(this.nodes.get(s), this.nodes.get(d), beann.getUtility()));
+            this.nodes.get(s).addEdge(this.nodes.get(d).N, new Edge(this.nodes.get(s), this.nodes.get(d), beann.getUtility(), beann.getId()));
             this.nodes.get(d).addNeighbor(this.nodes.get(s));
-            this.nodes.get(d).addEdge(this.nodes.get(s).N, new Edge(this.nodes.get(d), this.nodes.get(s), beann.getUtility()));
+            this.nodes.get(d).addEdge(this.nodes.get(s).N, new Edge(this.nodes.get(d), this.nodes.get(s), beann.getUtility(), beann.getId()));
 
         }
 

@@ -14,7 +14,7 @@ class EdgeBean {
     private int id;
     private int Utility;
     private String the_geom;
-    private List<Integer> AdjNode;
+    private List<Integer> Adj;
 
     public int getId() {
         return id;
@@ -40,11 +40,11 @@ class EdgeBean {
         this.the_geom = the_geom;
     }
 
-    public List<Integer> getAdjNode() {
-        return AdjNode;
+    public List<Integer> getAdj() {
+        return Adj;
     }
 
-    public void setAdjNode(List<Integer> AdjNode) {
-        this.AdjNode = AdjNode;
+    public void setAdj(List<Integer> Adj) {
+        this.Adj = Adj;
     }
 }
